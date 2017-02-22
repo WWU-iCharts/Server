@@ -1,9 +1,29 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask import send_from_directory
 from os import listdir, path
 import json
 
 app = Flask(__name__)
+
+@app.route("/", methods=['GET','POST'])
+def appstartup():
+  try:
+        responseJson = []
+
+        applist = request.get_json()
+
+        for i in range (0,len(applist)):
+           with open("/home/icharts/icharts/charts/" + applist[i]["regionID"] + "/" + applist[i]["regionID"] + "model.json", "r") as json_data:
+            data = json.load(json_data)
+            version = data["version"]
+            if (version > applist[i]["version"]):
+              responseJson.append(data)
+
+        return jsonify(responseJson)
+
+  except Exception, e:
+        return(str(e))
+
 
 @app.route("/charts/", methods=['GET'])
 def getAllCharts():
